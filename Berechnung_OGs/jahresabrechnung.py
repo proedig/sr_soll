@@ -18,16 +18,16 @@ soll = pd.read_excel('Sollberechnung/Saison_2023_2024/sollberechnung.xlsx',
 
 # Aktive SR berechnen
 
-files = {'Q3': '2023 Q3/Schiedsrichterstammdaten.xls',
-         'Q4': '2023 Q3/Schiedsrichterstammdaten.xls',
-         'Q1': '2023 Q3/Schiedsrichterstammdaten.xls',
-         'Q2': '2023 Q3/Schiedsrichterstammdaten.xls'}
+files = {'Q3': '2022 Q3/Schiedsrichterstammdaten.xls',
+         'Q4': '2022 Q4/Schiedsrichterstammdaten.xls',
+         'Q1': '2023 Q1/Schiedsrichterstammdaten.xls',
+         'Q2': '2023 Q2/Schiedsrichterstammdaten.xls'}
 
 sr_aktiv = pd.DataFrame(index=soll.index)
 
 for label, file in files.items():
     df = pd.read_excel(file, skiprows=2)
-    df = df.dropna(how='all')
+    df = df.dropna(subset='Vereinsnr.', how='all')
     df['V. Nr.'] = df['Vereinsnr.'].astype(int) + 21000000
     g = df.groupby('V. Nr.')
     sr_aktiv[label] = g['Ausweisnr.'].count()
@@ -58,10 +58,11 @@ sr = sr.dropna(how='all')
 sr['Soll-Status'] = sr['Soll-Status'].fillna('erfüllt')
 sr['SR seit'] = pd.to_datetime(sr['SR seit'], format='%d.%m.%Y')
 sr['neuer SR'] = sr.apply(functions.neuer_sr, axis=1, stichtag='2020-07-01')
+sr['V. Nr.'] = sr['Vereinsnr.'].astype(int) + 21000000
 
 # SR nach Verein gruppieren und Kennzahlen berechnen
 
-g = sr.groupby('Vereinsname')
+g = sr.groupby('V. Nr.')
 
 ist = pd.DataFrame(index=soll.index)
 ist['SR aktiv'] = g['Name'].count()
@@ -125,7 +126,7 @@ df['OG gesamt [€]'] = (df['OG Q2 [€]'] +
 
 # Ergebnisse sortieren und abspeichern
 
-df = df.sort_values(['OG gesamt [€]', 'Verein'])
+df = df.sort_values(['OG gesamt [€]', 'Vereinsname'])
 print('Gesamtsumme: ', df['OG gesamt [€]'].sum())
 
 #df.to_excel('jahresendabrechnung.xlsx', float_format="%.2f")

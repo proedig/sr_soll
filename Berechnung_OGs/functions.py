@@ -75,14 +75,14 @@ def nachzahlung(row):
 
 
 def neuer_sr(row, stichtag):
-    # SR hat seinen Soll nicht erfüllt:
+    # SR hat sein Soll nicht erfüllt:
     if row['Soll-Status'] != 'erfüllt':
         return False
     # SR ist noch nicht seit 2 Jahren Schiedsrichter:
     now = datetime.datetime.now()
     if row['SR seit'].replace(year=row['SR seit'].year+2) > now:
         return False 
-    # Bonus wurde für den SR in der Vergangenheit (vermutlich) schon berechnet:
+    # Bonus wurde für den SR in der Vergangenheit schon berechnet:
     stichtag = pd.to_datetime(stichtag)
     if row['SR seit'] >= stichtag:
         return True
