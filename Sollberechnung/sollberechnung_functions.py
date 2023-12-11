@@ -60,31 +60,6 @@ def og(row):
         # Sonstige:
         case _:
             return 62.50
-        
-
-def sr_per_team_2(group):
-    ms_art = group['MS-Art'].iloc[0]
-    spielklasse = group['Spielklasse'].iloc[0]
-    team = group['Mannschaftsname'].iloc[0]
-    anzahl_vereine = group['Verein'].nunique()
-    match ms_art, spielklasse:
-        case 'Herren', 'Kreisliga C':
-            return 1/anzahl_vereine
-        case 'Frauen', 'Kreisliga B':
-            return 1/anzahl_vereine
-        case 'A-Junioren' | 'B-Junioren', 'Kreisliga A':
-            return 1/anzahl_vereine
-        case 'C-Junioren', 'Kreisliga A':
-            return 0
-        case 'B-Juniorinnen' | 'C-Juniorinnen' | 'D-Junioren' | 'E-Junioren' | 'F-Junioren' | 'G-Junioren' | 'E-Juniorinnen', 'Kreisliga A':
-            return 0
-        case _:
-            msg = '{}: Liga "{}" kann nicht verarbeitet werden.'.format(team, spielklasse)
-            raise Exception(msg)
-            
-            
-def is_spielgemeinschaft(row, ref):
-    return (ref['Mannschaftsname'] == row['Mannschaftsname']).any()
     
             
 def clubs_to_list(row):
@@ -93,16 +68,20 @@ def clubs_to_list(row):
 
 def og_per_club(group):
     herren = group[group['MS-Art'] == 'Herren']
+    
+    # Verein hat Herrenmannschaft
     if len(herren) > 0:
-        return herren['OG'].max() # Verein hat Herrenmannschaft
+        return herren['OG'].max()
+    # Verein hat keine Herrenmannschaft
     else:
-        return group['OG'].max() # Verein hat keine Herrenmannschaft
+        return group['OG'].max() 
     
 def relevant_teams(group):
     rel = group[group['SR'] > 0]
     if len(rel) == 0: return pd.NA
     rel = rel.sort_values('SR', ascending=False)
-    text = rel.agg(lambda row: '{} {} ({} SR)'.format(row['Mannschaftsname'], 
-                                                      row['MS-Art'],
-                                                      round(row['SR'], 2)), axis=1)
+    text = rel.agg(
+        lambda row: '{} {} ({} SR)'.format(row['Mannschaftsname'], 
+                                           row['MS-Art'],
+                                           round(row['SR'], 2)), axis=1)
     return text.str.cat(sep=', ')
