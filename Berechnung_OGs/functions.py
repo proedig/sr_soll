@@ -108,7 +108,8 @@ def namen_neue_sr(group):
 
 
 def quartalsbericht_erstellen(quartal, soll, sr_aktiv, sr_fehl, ratio, 
-                              og_pro_sr_fehl, og_abschlag):
+                              og_pro_sr_fehl, og_abschlag,
+                              output_file):
     df = soll[['Vereinsname', 'SR-Soll', 'Basis-OG pro SR-Fehl [€]']]
     df['SR-Ist'] = sr_aktiv[quartal]
     df['SR-Fehl'] = sr_fehl[quartal]
@@ -117,6 +118,6 @@ def quartalsbericht_erstellen(quartal, soll, sr_aktiv, sr_fehl, ratio,
     df['OG [€]'] = og_abschlag[quartal]
     df = df.iloc[:, [0,1,3,4,5,2,6,7]]
     df = df.sort_values(['OG [€]', 'Vereinsname'])
-    df.to_excel('Quartalsabrechnung_Q3_2023.xlsx', float_format="%.2f")
+    df.to_excel(output_file, float_format="%.2f")
     return df
     
