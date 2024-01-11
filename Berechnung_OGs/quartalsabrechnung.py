@@ -10,7 +10,7 @@ import pandas as pd
 def og(row):
     if row['SR-Soll'] == 0: return row['Basis-OG pro SR-Fehl [€]']
     ratio = row['SR-Ist']/row['SR-Soll']
-    if ratio < 0.6:
+    if ratio < 0.595:
         return row['Basis-OG pro SR-Fehl [€]']*1.5
     else:
         return row['Basis-OG pro SR-Fehl [€]']
@@ -18,22 +18,23 @@ def og(row):
 
 # Sollberechnung laden
 
-soll = pd.read_excel('Sollberechnung2022_2023.xlsx')
+soll = pd.read_excel('Sollberechnung/Saison_2023_2024/sollberechnung.xlsx')
 
 # SR-Stammtdaten laden und gruppieren
 
-sr = pd.read_excel('Schiedsrichterstammdaten.xls', skiprows=2)
+sr = pd.read_excel('2023 Q3/Schiedsrichterstammdaten.xls', skiprows=2)
 sr = sr.dropna(how='all')
+sr['V. Nr.'] = sr['Vereinsnr.'].astype(int) + 21000000
 
-g = sr.groupby('Vereinsname')
+g = sr.groupby('V. Nr.')
 
 ist = pd.DataFrame()
 ist['SR-Ist'] = g['Name'].count()
 
 # Soll und Ist vereinen
 
-soll = soll[['Verein', 'SR-Soll', 'Basis-OG pro SR-Fehl [€]']]
-df = soll.merge(ist, how='outer', left_on='Verein', right_index=True)
+soll = soll[['V. Nr.', 'Vereinsname', 'SR-Soll', 'Basis-OG pro SR-Fehl [€]']]
+df = soll.merge(ist, how='outer', left_on='V. Nr.', right_index=True)
 
 df['SR-Ist'] = df['SR-Ist'].fillna(0)
 df['SR-Fehl'] = (df['SR-Soll'] - df['SR-Ist']).apply(lambda x: max(0, x))
@@ -41,8 +42,8 @@ df['Ist/Soll [%]'] =  df['SR-Ist']/df['SR-Soll']*100
 df['OG pro SR-Fehl [€]'] = df.apply(og, axis=1)
 df['OG [€]'] = (df['OG pro SR-Fehl [€]']*df['SR-Fehl']) # .round(2)
 
-df = df.iloc[:, [0,1,3,4,5,2,6,7]]
+df = df.iloc[:, [0,1,2,4,5,6,3,7,8]]
 
-df = df.sort_values(['OG [€]', 'Verein'])
+df = df.sort_values(['OG [€]', 'Vereinsname'])
 
-df.to_excel('Quartalsabrechnung_2_2023.xlsx', index=False, float_format="%.2f")
+df.to_excel('Quartalsabrechnung_Q3_2023.xlsx', index=False, float_format="%.2f")
