@@ -42,8 +42,7 @@ def sr_per_team(row):
               | 'D-Junioren'
               | 'D-Juniorinnen'
               | 'E-Junioren' 
-              | 'E-Juniorinnen' 
-              | 'B-Juniorinnen', 
+              | 'E-Juniorinnen', 
               _):
             return 0
         # Altherren
