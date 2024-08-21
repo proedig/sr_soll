@@ -92,7 +92,7 @@ def neuer_sr(row, stichtag):
     
 def bonus_neue_sr(row):
     """Gibt den Bonus für neue SR in Euro zurück."""
-    if row['SR-Ist'] > row['SR-Soll']:
+    if row['SR-Ist Q2'] > row['SR-Soll']:
         return row['Anzahl neue SR']*(-200)
     else:
         return 0

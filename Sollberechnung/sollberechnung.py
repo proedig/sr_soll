@@ -9,13 +9,21 @@ import pandas as pd
 import sollberechnung_functions as f
 pd.options.mode.copy_on_write = True
 
-# Mannschaften aus Meldeliste einlesen
+# Fußball-Mannschaften aus Meldeliste einlesen
+teams1 = pd.read_excel(
+    'Sollberechnung/Saison_2024_2025/20240819_meldeliste.xls',
+    skiprows=2)
 
-teams = pd.read_excel('Sollberechnung/Saison_2023_2024/20230820_meldeliste.xls',
-                      skiprows=2)
+# Futsal-Mannschaften aus Meldeliste einlesen
+teams2 = pd.read_excel(
+    'Sollberechnung/Saison_2024_2025/20240819_meldeliste (1).xls',
+    skiprows=2)
 
-teams = teams.melt(id_vars=teams.columns[:8], var_name='Liga')
-teams = teams.dropna()
+# Beide Meldelisten vereinen
+teams = pd.concat([teams1, teams2])
+
+teams = teams.melt(id_vars=teams.columns[:10], var_name='Liga')
+teams = teams.dropna(subset='value')
 print('Anzahl Vereine:', teams['V. Nr.'].nunique())
         
 teams['SR'] = teams.apply(f.sr_per_team, axis=1)

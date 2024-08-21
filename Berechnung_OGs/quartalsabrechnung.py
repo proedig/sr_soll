@@ -22,7 +22,7 @@ soll = pd.read_excel('Sollberechnung/Saison_2023_2024/sollberechnung.xlsx')
 
 # SR-Stammtdaten laden und gruppieren
 
-sr = pd.read_excel('2023 Q3/Schiedsrichterstammdaten.xls', skiprows=2)
+sr = pd.read_excel('2024 Q1/Schiedsrichterstammdaten.xls', skiprows=2)
 sr = sr.dropna(how='all')
 sr['V. Nr.'] = sr['Vereinsnr.'].astype(int) + 21000000
 
@@ -46,4 +46,4 @@ df = df.iloc[:, [0,1,2,4,5,6,3,7,8]]
 
 df = df.sort_values(['OG [€]', 'Vereinsname'])
 
-df.to_excel('Quartalsabrechnung_Q3_2023.xlsx', index=False, float_format="%.2f")
+df.to_excel('Quartalsabrechnung_Q1_2024.xlsx', index=False, float_format="%.2f")

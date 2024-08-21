@@ -14,12 +14,14 @@ def sr_per_team(row):
             return 4
         case 'Herren', '3BL' | 'RLW' | 'OLWFV' | 'VL' | 'LL':
             return 3
-        case 'Herren', _:
+        case 'Herren', 'BzL' | 'KLA' | 'KLB' | 'KLC' | 'FRL':
             return 1
+        case 'Herren', 'FVL':
+            return 0
         # Frauen:
         case 'Frauen', 'BL' | '2BL' | 'RLW':
             return 3
-        case 'Frauen', _:
+        case 'Frauen', 'VL' | 'LL' | 'BzL' | 'KLA' | 'KLB':
             return 1
         # Jugend:
         case 'A-Junioren' | 'B-Junioren', 'BL':
@@ -32,13 +34,30 @@ def sr_per_team(row):
             return 1
         case 'A-Junioren' | 'B-Junioren', _:
             return 1
-        # Sonstige:
-        case _, 'BLCup' | 'AOL' | 'BzLAuf':
-            msg = '{}: Liga "{}" kann nicht verarbeitet werden.'.format(
-                row['Mannschaftsname'], row['Liga'])
-            raise Exception(msg)
-        case _:
+        case _, 'Ki':
             return 0
+        case ('B-Juniorinnen'
+              | 'C-Junioren'
+              | 'C-Juniorinnen'
+              | 'D-Junioren'
+              | 'D-Juniorinnen'
+              | 'E-Junioren' 
+              | 'E-Juniorinnen' 
+              | 'B-Juniorinnen', 
+              _):
+            return 0
+        # Altherren
+        case 'Herren Ü60' | 'Herren Ü50' | 'Herren Ü40' | 'Herren Ü32', _:
+            return 0
+        # Sonstige:
+        case _, 'WFKLA':
+            return 0
+        case _, _:
+            msg = '{}: {} mit Liga "{}" kann nicht verarbeitet werden.'.format(
+                row['Mannschaftsname'], row['MS-Art'], row['Liga'])
+            raise Exception(msg)
+        # case _:
+        #     return 0
 
 
 def og(row):
@@ -48,7 +67,7 @@ def og(row):
             return 125
         case 'Herren', 'RLW':
             return 112.5
-        case 'Herren', 'OLWFV' | 'VL':
+        case 'Herren', 'OLWFV' | 'VL' | 'FBL':
             return 100
         case 'Herren', 'LL' | 'BzL':
             return 75
