@@ -11,12 +11,12 @@ pd.options.mode.copy_on_write = True
 
 # Fußball-Mannschaften aus Meldeliste einlesen
 teams1 = pd.read_excel(
-    'Sollberechnung/Saison_2024_2025/20240819_meldeliste.xls',
+    'Sollberechnung/Saison_2025_2026/Mannschaftesmeldungen 2526.xls',
     skiprows=2)
 
 # Futsal-Mannschaften aus Meldeliste einlesen
 teams2 = pd.read_excel(
-    'Sollberechnung/Saison_2024_2025/20240819_meldeliste (1).xls',
+    'Sollberechnung/Saison_2025_2026/20250930_meldeliste.xls',
     skiprows=2)
 
 # Beide Meldelisten vereinen

@@ -5,20 +5,30 @@ Created on Sun Jul  9 23:11:16 2023
 @author: proed
 """
 
+"""
+Folgende Dinge müssen jedes Jahr angepasst werden:
+    
+    - Input-Datei mit Sollzahlen (Zeile 24)
+    - Input-Datei mit allen SR der abgelaufenen Saison inkl. Aufhörer (Zeile 31)
+    - Input-Dateien mit Schiedsrichterstammdaten (Zeilen 40 - 43)
+    - Betrachtungszeitraum für neue SR (Zeilen 101 - 102)
+"""
+
 import pandas as pd
 pd.options.mode.copy_on_write = True
 import functions
 
 # Sollberechnung laden
 
-soll = pd.read_excel('Sollberechnung/Saison_2023_2024/sollberechnung.xlsx',
-                     index_col='V. Nr.') 
-                     # usecols=['Verein','SR-Soll', 'Basis-OG pro SR-Fehl [€]'], 
-                     # )
+soll = pd.read_excel(
+    io='Sollberechnung/Saison_2024_2025/SR-Soll Saison 2024_2025.xlsx',
+    index_col='V. Nr.') 
+    # usecols=['Verein','SR-Soll', 'Basis-OG pro SR-Fehl [€]'], 
+    # )
 
 # Alle SR der abgelaufenen Saison laden (inkl. Aufhörer)
 
-sr = pd.read_excel('2024 Q2/sr_saison_2023_2024.xlsx')
+sr = pd.read_excel('2025 Q2/sr_saison_2024_2025.xlsx')
 sr = sr.dropna(how='all')
 sr['Soll-Status'] = sr['Soll-Status'].fillna('erfüllt')
 sr['SR seit'] = pd.to_datetime(sr['SR seit'], format='%d.%m.%Y')
@@ -27,10 +37,10 @@ sr['SR seit'] = pd.to_datetime(sr['SR seit'], format='%d.%m.%Y')
 
 # Aktive SR berechnen
 
-files = {'Q3': '2023 Q3/Schiedsrichterstammdaten.xls',
-         'Q4': '2023 Q4/Schiedsrichterstammdaten.xls',
-         'Q1': '2024 Q1/Schiedsrichterstammdaten.xls',
-         'Q2': '2024 Q2/Schiedsrichterstammdaten.xls'}
+files = {'Q3': '2024 Q3/Schiedsrichterstammdaten.xls',
+         'Q4': '2024 Q4/Schiedsrichterstammdaten.xls',
+         'Q1': '2025 Q1/Schiedsrichterstammdaten.xls',
+         'Q2': '2025 Q2/Schiedsrichterstammdaten.xls'}
 
 sr_aktiv = pd.DataFrame(index=soll.index)
 sr_nicht_erfuellt = pd.DataFrame(index=soll.index)
@@ -86,7 +96,10 @@ og_abschlag['Q2'] = 0
 # Neue SR für Bonus-Zahlungen bestimmen (betrifft nur Q2 weil letztes Quartal)
 
 df['SR seit'] = pd.to_datetime(df['SR seit'], format='%d.%m.%Y')
-df['neuer SR'] = df.apply(functions.neuer_sr, axis=1, stichtag='2021-07-01')
+df['neuer SR'] = df.apply(functions.neuer_sr,
+                          axis=1,
+                          zeitraum_start='2022-07-01',
+                          zeitraum_end='2023-06-30')
 
 g = df.groupby('V. Nr.')
 

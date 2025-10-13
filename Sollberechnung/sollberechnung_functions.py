@@ -16,6 +16,8 @@ def sr_per_team(row):
             return 3
         case 'Herren', 'BzL' | 'KLA' | 'KLB' | 'KLC' | 'FRL':
             return 1
+        case 'Herren', 'FBL':
+            return 2
         case 'Herren', 'FVL':
             return 0
         # Frauen:
@@ -30,13 +32,14 @@ def sr_per_team(row):
             return 2
         case 'C-Junioren', 'RLW':
             return 1
-        case 'B-Juniorinnen', 'BL' | 'RLW':
+        case 'A-Juniorinnen' | 'B-Juniorinnen', 'BL' | 'RLW':
             return 1
         case 'A-Junioren' | 'B-Junioren', _:
             return 1
         case _, 'Ki':
             return 0
-        case ('B-Juniorinnen'
+        case ('A-Juniorinnen'
+              | 'B-Juniorinnen'
               | 'C-Junioren'
               | 'C-Juniorinnen'
               | 'D-Junioren'
@@ -46,7 +49,12 @@ def sr_per_team(row):
               _):
             return 0
         # Altherren
-        case 'Herren Ü60' | 'Herren Ü50' | 'Herren Ü40' | 'Herren Ü32', _:
+        case ('Herren Ü70'
+              | 'Herren Ü60'
+              | 'Herren Ü50'
+              | 'Herren Ü40'
+              | 'Herren Ü32', 
+              _):
             return 0
         # Sonstige:
         case _, 'WFKLA':

@@ -11,10 +11,10 @@ aber zum Saisonende (Q2) passiv sind.
 
 import pandas as pd
 
-files = {'Q3': '2023 Q3/Schiedsrichterstammdaten.xls',
-         'Q4': '2023 Q4/Schiedsrichterstammdaten.xls',
-         'Q1': '2024 Q1/Schiedsrichterstammdaten.xls',
-         'Q2': '2024 Q2/Schiedsrichterstammdaten.xls'}
+files = {'Q3': '2024 Q3/Schiedsrichterstammdaten.xls',
+         'Q4': '2024 Q4/Schiedsrichterstammdaten.xls',
+         'Q1': '2025 Q1/Schiedsrichterstammdaten.xls',
+         'Q2': '2025 Q2/Schiedsrichterstammdaten.xls'}
 
 dfs = []
 
@@ -36,7 +36,7 @@ pivot = pivot.notna().astype(int)
 # Liste mit Ausweisnummer, Name und Vorname erzeugen
 names = df[['Ausweisnr.', 'Name', 'Vorname', 'Vereinsname', 'SR seit']]
 names = names.drop_duplicates(subset='Ausweisnr.', keep='last')
-names.to_excel('sr_saison_2023_2024.xlsx', index=False)
+names.to_excel('sr_saison_2024_2025.xlsx', index=False)
 names = names[['Ausweisnr.', 'Name', 'Vorname']]
 
 # Name und Vorname ergänzen

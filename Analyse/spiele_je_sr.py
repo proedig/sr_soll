@@ -20,16 +20,12 @@ sr['Alter'] = (datetime.datetime(2023, 6, 30) - sr['Geburtsdatum'])/(
     pd.to_timedelta('365.25D'))
 sr = sr[sr['SR seit'] <= '2022-07-01']
 
-
-
 sr_ids = sr['Ausweisnr.'].unique()
 
 # Spiele laden
 
 df = pd.read_excel('Analyse/SpieleExport.xls', skiprows=2)
 df = df.dropna(subset='Spielkennung:')
-
-df['Spielkennung:'] = df['Spielkennung:'].astype(int)
 
 gebiete = ['Deutschland', 'Region Westdeutschland', 'Kreis Münster',
            'Kreis Gütersloh', 'Kreis Dortmund', 'Kreis Ahaus-Coesfeld', 
