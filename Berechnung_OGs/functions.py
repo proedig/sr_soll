@@ -1,5 +1,4 @@
 import pandas as pd
-pd.options.mode.copy_on_write = True
 import datetime
 
 def og_pro_sr_fehl(row):

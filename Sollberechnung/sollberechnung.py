@@ -1,6 +1,5 @@
 import pandas as pd
 import sollberechnung_functions as f
-pd.options.mode.copy_on_write = True
 
 # Fußball-Mannschaften aus Meldeliste einlesen
 teams1 = pd.read_excel(

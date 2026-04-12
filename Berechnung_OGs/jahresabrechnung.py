@@ -6,9 +6,7 @@ Folgende Dinge müssen jedes Jahr angepasst werden:
     - Input-Dateien mit Schiedsrichterstammdaten (Zeilen 40 - 43)
     - Betrachtungszeitraum für neue SR (Zeilen 101 - 102)
 """
-
 import pandas as pd
-pd.options.mode.copy_on_write = True
 import functions
 
 # Sollberechnung laden
