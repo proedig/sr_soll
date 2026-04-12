@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Oct  9 21:57:48 2022
-
-@author: proed
-"""
-
 import pandas as pd
 
 def og(row):
@@ -15,14 +8,13 @@ def og(row):
     else:
         return row['Basis-OG pro SR-Fehl [€]']
 
-
 # Sollberechnung laden
 
 soll = pd.read_excel('Sollberechnung/Saison_2025_2026/SR-Soll Saison 2025_2026.xlsx')
 
 # SR-Stammtdaten laden und gruppieren
 
-sr = pd.read_excel('2025 Q3/sr-stammdaten.xlsx', skiprows=10)
+sr = pd.read_excel('2025 Q4/sr-stammdaten.xlsx', skiprows=10)
 sr = sr.dropna(how='all')
 
 g = sr.groupby('Vereinsnummer')
@@ -50,4 +42,4 @@ if df["SR-Soll"].count() != len(df):
 
 df = df.sort_values(['OG [€]', 'Vereinsname'])
 
-df.to_excel('Quartalsabrechnung_Q3_2025.xlsx', index=False, float_format="%.2f")
+df.to_excel('Quartalsabrechnung_Q4_2025.xlsx', index=False, float_format="%.2f")

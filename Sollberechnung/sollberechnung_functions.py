@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Aug 28 23:16:42 2023
-
-@author: proed
-"""
-
 import pandas as pd
 
 def sr_per_team(row):

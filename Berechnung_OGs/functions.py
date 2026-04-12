@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 29 20:37:31 2023
-
-@author: proed
-"""
-
 import pandas as pd
 pd.options.mode.copy_on_write = True
 import datetime

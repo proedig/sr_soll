@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jul  9 23:11:16 2023
-
-@author: proed
-"""
-
 """
 Folgende Dinge müssen jedes Jahr angepasst werden:
     

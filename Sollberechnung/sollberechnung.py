@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Aug 26 12:09:37 2023
-
-@author: proed
-"""
-
 import pandas as pd
 import sollberechnung_functions as f
 pd.options.mode.copy_on_write = True
