@@ -11,16 +11,15 @@ aber zum Saisonende (Q2) passiv sind.
 
 import pandas as pd
 
-files = {'Q3': '2024 Q3/Schiedsrichterstammdaten.xls',
-         'Q4': '2024 Q4/Schiedsrichterstammdaten.xls',
-         'Q1': '2025 Q1/Schiedsrichterstammdaten.xls',
-         'Q2': '2025 Q2/Schiedsrichterstammdaten.xls'}
+files = {'Q3': '2025 Q3/sr-stammdaten.xlsx',
+         'Q4': '2025 Q4/sr-stammdaten.xlsx',
+         'Q1': '2026 Q1/sr-stammdaten.xlsx',
+         'Q2': '2026 Q2/sr-stammdaten.xlsx'}
 
 dfs = []
 
 for quartal, file in files.items():
-    df = pd.read_excel(file, skiprows=2)
-    df = df.dropna(subset='Vereinsnr.', how='all')
+    df = pd.read_excel(file, skiprows=10)
     df['Quartal'] = quartal
     dfs.append(df)
     
@@ -28,23 +27,34 @@ df = pd.concat(dfs)
 
 # Pivot-Tabelle für Quartale erzeugen
 pivot = df.pivot(columns='Quartal', 
-                 index='Ausweisnr.',
-                 values='Ausweisnr.')
+                 index='Ausweisnummer',
+                 values='Ausweisnummer')
 
 pivot = pivot.notna().astype(int)
 
 # Liste mit Ausweisnummer, Name und Vorname erzeugen
-names = df[['Ausweisnr.', 'Name', 'Vorname', 'Vereinsname', 'SR seit']]
-names = names.drop_duplicates(subset='Ausweisnr.', keep='last')
-names.to_excel('sr_saison_2024_2025.xlsx', index=False)
-names = names[['Ausweisnr.', 'Name', 'Vorname']]
+names = df[['Ausweisnummer', 'Nachname', 'Vorname', 'Vereinsname', 'Vereinsnummer','SR seit']]
+names = names.drop_duplicates(subset='Ausweisnummer', keep='last')
+# names.to_excel('sr_saison_2025_2026.xlsx', index=False)
+# names = names[['Ausweisnummer', 'Nachname', 'Vorname']]
 
 # Name und Vorname ergänzen
-pivot = pivot.merge(names, on='Ausweisnr.')
+pivot = pivot.merge(names, on='Ausweisnummer').sort_values(by=['Nachname', 'Vorname'])
 
 # Spalten in richtige Reihenfolge bringen
-pivot = pivot[['Ausweisnr.', 'Name', 'Vorname', 'Q3', 'Q4', 'Q1', 'Q2']]
+pivot = pivot[['Ausweisnummer',
+               'Nachname',
+               'Vorname',
+               'Vereinsname',
+               'Vereinsnummer',
+               'SR seit',
+               'Q3',
+               'Q4',
+               'Q1',
+               'Q2'
+               ]]
+
+pivot.to_excel('sr_saison_2025_2026.xlsx', index=False)
 
 # Nur die Fälle betrachten, die jetzt (Q2) nicht mehr aktiv sind
 relevant = pivot[pivot['Q2'] == 0]
-

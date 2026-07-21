@@ -12,14 +12,14 @@ import functions
 # Sollberechnung laden
 
 soll = pd.read_excel(
-    io='Sollberechnung/Saison_2024_2025/SR-Soll Saison 2024_2025.xlsx',
+    io='Sollberechnung/Saison_2025_2026/SR-Soll Saison 2025_2026.xlsx',
     index_col='V. Nr.') 
     # usecols=['Verein','SR-Soll', 'Basis-OG pro SR-Fehl [€]'], 
     # )
 
 # Alle SR der abgelaufenen Saison laden (inkl. Aufhörer)
 
-sr = pd.read_excel('2025 Q2/sr_saison_2024_2025.xlsx')
+sr = pd.read_excel('2026 Q2/sr_saison_2024_2025.xlsx')
 sr = sr.dropna(how='all')
 sr['Soll-Status'] = sr['Soll-Status'].fillna('erfüllt')
 sr['SR seit'] = pd.to_datetime(sr['SR seit'], format='%d.%m.%Y')
