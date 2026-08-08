@@ -32,8 +32,15 @@ pivot = df.pivot(columns='Quartal',
 
 pivot = pivot.notna().astype(int)
 
+# Check, ob Vereinswechsel während der Saison stattgefunden haben
+clubs = df.pivot(columns='Quartal', 
+                 index='Ausweisnummer',
+                 values='Vereinsname')
+
+clubs["vereine"] = clubs.nunique(axis=1)
+
 # Liste mit Ausweisnummer, Name und Vorname erzeugen
-names = df[['Ausweisnummer', 'Nachname', 'Vorname', 'Vereinsname', 'Vereinsnummer','SR seit']]
+names = df[['Ausweisnummer', 'Nachname', 'Vorname', 'Soll-Status', 'Vereinsname', 'Vereinsnummer','SR seit']]
 names = names.drop_duplicates(subset='Ausweisnummer', keep='last')
 # names.to_excel('sr_saison_2025_2026.xlsx', index=False)
 # names = names[['Ausweisnummer', 'Nachname', 'Vorname']]
@@ -45,6 +52,7 @@ pivot = pivot.merge(names, on='Ausweisnummer').sort_values(by=['Nachname', 'Vorn
 pivot = pivot[['Ausweisnummer',
                'Nachname',
                'Vorname',
+               'Soll-Status',
                'Vereinsname',
                'Vereinsnummer',
                'SR seit',

@@ -20,7 +20,7 @@ def anzahl_sr_unter_soll(group):
         return 0
     
     
-def count_soll_status(group, status):
+def count_soll_status(group: pd.DataFrame, status: str) -> int:
     counts = group['Soll-Status'].value_counts()
     try:
         return counts[status]
@@ -28,7 +28,7 @@ def count_soll_status(group, status):
         return 0
     
 
-def sr_unter_soll(group):
+def sr_unter_soll(group: pd.DataFrame) -> str:
     group = group[group['Soll-Status'] == 'nicht erfüllt']
     new_name = group['Name'].combine(group['SR seit'], 
                                      lambda x,y: '{} ({})'.format(x,y.date()))
@@ -37,14 +37,14 @@ def sr_unter_soll(group):
     return str.join(', ', names)
 
 
-def og(row):
+def og(row: pd.Series) -> float:
     if row['SR-Fehl'] > 0:
         return row['SR-Fehl']*row['OG pro SR-Fehl [€]']
     else:
         return row['SR-Fehl']*100
 
 
-def nachzahlung(row):
+def nachzahlung(row: pd.Series) -> float:
     # Nachzahlung für die SR unter Soll
     if row['SR-Fehl'] > 0:
         nachzahlung = (row[['davon Soll nicht erfüllt', 'SR-Fehl']].min()*
@@ -73,20 +73,23 @@ def neuer_sr(row: pd.Series,
     # SR hat sein Soll nicht erfüllt:
     if row['Soll-Status'] != 'erfüllt':
         return False
+
     # SR ist noch nicht seit 2 Jahren Schiedsrichter:
     now = datetime.datetime.now()
     if row['SR seit'].replace(year=row['SR seit'].year+2) > now:
         return False 
+
     # Beginn des Schiedsrichters muss im Betrachtungszeitraum liegen:
     zeitraum_start = pd.to_datetime(zeitraum_start)
     zeitraum_end = pd.to_datetime(zeitraum_end)
+
     if zeitraum_start <= row['SR seit'] <= zeitraum_end:
         return True
     else:
         return False
     
     
-def bonus_neue_sr(row):
+def bonus_neue_sr(row: pd.Series) -> int:
     """Gibt den Bonus für neue SR in Euro zurück."""
     if row['SR-Ist Q2'] > row['SR-Soll']:
         return row['Anzahl neue SR']*(-200)
@@ -94,9 +97,9 @@ def bonus_neue_sr(row):
         return 0
     
     
-def namen_neue_sr(group):
+def namen_neue_sr(group: pd.DataFrame) -> str:
     group = group[group['neuer SR']]
-    new_name = group['Name'].combine(group['SR seit'], 
+    new_name = group['Nachname'].combine(group['SR seit'], 
                                      lambda x,y: '{} ({})'.format(x,y.date()))
     # names = group['Name'].to_list()
     names = new_name.to_list()

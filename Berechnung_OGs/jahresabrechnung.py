@@ -10,28 +10,25 @@ import pandas as pd
 import functions
 
 # Sollberechnung laden
-
 soll = pd.read_excel(
     io='Sollberechnung/Saison_2025_2026/SR-Soll Saison 2025_2026.xlsx',
-    index_col='V. Nr.') 
-    # usecols=['Verein','SR-Soll', 'Basis-OG pro SR-Fehl [€]'], 
-    # )
+    index_col='Vereinsnummer'
+    )
+
+# Vereinswechsler laden, die noch ihrem alten Verein zugeordnet werden sollen
+sr_offset = pd.read_excel('2026 Q2/wechsler.xlsx', index_col='Vereinsnummer')
 
 # Alle SR der abgelaufenen Saison laden (inkl. Aufhörer)
-
-sr = pd.read_excel('2026 Q2/sr_saison_2024_2025.xlsx')
+sr = pd.read_excel('2026 Q2/sr_saison_2025_2026.xlsx')
 sr = sr.dropna(how='all')
 sr['Soll-Status'] = sr['Soll-Status'].fillna('erfüllt')
 sr['SR seit'] = pd.to_datetime(sr['SR seit'], format='%d.%m.%Y')
 
-# sr['V. Nr.'] = sr['Vereinsnr.'].astype(int) + 21000000
-
 # Aktive SR berechnen
-
-files = {'Q3': '2024 Q3/Schiedsrichterstammdaten.xls',
-         'Q4': '2024 Q4/Schiedsrichterstammdaten.xls',
-         'Q1': '2025 Q1/Schiedsrichterstammdaten.xls',
-         'Q2': '2025 Q2/Schiedsrichterstammdaten.xls'}
+files = {'Q3': '2025 Q3/sr-stammdaten.xlsx',
+         'Q4': '2025 Q4/sr-stammdaten.xlsx',
+         'Q1': '2026 Q1/sr-stammdaten.xlsx',
+         'Q2': '2026 Q2/sr-stammdaten.xlsx'}
 
 sr_aktiv = pd.DataFrame(index=soll.index)
 sr_nicht_erfuellt = pd.DataFrame(index=soll.index)
@@ -39,17 +36,17 @@ sr_haertefall = pd.DataFrame(index=soll.index)
 
 for label, file in files.items():
     # Stammdaten laden
-    df = pd.read_excel(file, skiprows=2)
-    df = df.dropna(subset='Vereinsnr.', how='all')
-    df['V. Nr.'] = df['Vereinsnr.'].astype(int) + 21000000
+    df = pd.read_excel(file, skiprows=10)
     
     # Soll-Status hinzufügen
-    df = df.merge(sr[['Ausweisnr.', 'Soll-Status']],
-                  on='Ausweisnr.',
-                  how='left')
+    df = df.merge(sr[['Ausweisnummer', 'Soll-Status']],
+                  on='Ausweisnummer',
+                  how='left',
+                  suffixes=('_stammdaten', '')
+                  )
     
     # Nach Verein gruppieren und auswerten
-    g = df.groupby('V. Nr.')
+    g = df.groupby('Vereinsnummer')
     
     # Anzahl der aktiven SR berechnen
     sr_aktiv[label] = g.size()
@@ -67,9 +64,8 @@ sr_nicht_erfuellt = sr_nicht_erfuellt.fillna(0)
 sr_haertefall = sr_haertefall.fillna(0)
 
 # Ursprüngliche OG-Berechnung durchführen
-
 sr_fehl = -sr_aktiv.subtract(soll['SR-Soll'], axis='index')
-sr_fehl = sr_fehl.map(lambda x: max(0, x))
+sr_fehl = sr_fehl.clip(lower=0)
 
 ratio = sr_aktiv.divide(soll['SR-Soll'], axis='index')
 ratio_faktor = (ratio < 0.595).replace({False: 1, True: 1.5})
@@ -85,18 +81,17 @@ og_abschlag['Q2'] = 0
 #     'Quartalsabrechnung_Q2_2024.xlsx')
 
 # Neue SR für Bonus-Zahlungen bestimmen (betrifft nur Q2 weil letztes Quartal)
-
 df['SR seit'] = pd.to_datetime(df['SR seit'], format='%d.%m.%Y')
 df['neuer SR'] = df.apply(functions.neuer_sr,
                           axis=1,
-                          zeitraum_start='2022-07-01',
-                          zeitraum_end='2023-06-30')
+                          zeitraum_start='2023-07-01',
+                          zeitraum_end='2024-06-30')
 
-g = df.groupby('V. Nr.')
+g = df.groupby('Vereinsnummer')
 
 # Neue OG-Berechnung durchführen
-
 sr_ist = sr_aktiv - sr_nicht_erfuellt
+sr_ist = sr_ist.add(sr_offset[["Q3", "Q4", "Q1", "Q2"]], fill_value=0)
 sr_fehl = -sr_ist.subtract(soll['SR-Soll'], axis='index')
 
 bonus_überschuss = sr_fehl + sr_haertefall
@@ -114,11 +109,9 @@ og = sr_fehl.multiply(og_pro_sr_fehl, axis='index')
 og['Q2'] = og['Q2'] + bonus_überschuss['Q2']
 
 # Differenz zwischen ursprünglicher und neuer Soll-Berechnung
-
 og_diff = og.subtract(og_abschlag)
 
 # Ergebnisse zusammenfassen
-
 df = soll[['Vereinsname', 'SR-Soll', 'Basis-OG pro SR-Fehl [€]']]
 df['SR aktiv Q2'] = sr_aktiv['Q2']
 df['SR-Ist Q2'] = sr_ist['Q2']
@@ -145,6 +138,7 @@ with pd.ExcelWriter('jahresendabrechnung.xlsx') as writer:
     sr_aktiv.to_excel(writer, sheet_name='Aktive', float_format="%.2f")
     sr_nicht_erfuellt.to_excel(writer, sheet_name='Soll nicht erfüllt', float_format="%.2f")
     sr_haertefall.to_excel(writer, sheet_name='Härtefälle', float_format="%.2f")
+    sr_offset.to_excel(writer, sheet_name='Korrektur Neu-SR', float_format="%.2f")
     og_abschlag.to_excel(writer, sheet_name='Abschläge', float_format="%.2f")
     sr_ist.to_excel(writer, sheet_name='SR-Ist', float_format="%.2f")
     sr_fehl.to_excel(writer, sheet_name='SR-Fehl', float_format="%.2f")
