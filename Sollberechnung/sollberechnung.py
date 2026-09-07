@@ -3,27 +3,26 @@ import sollberechnung_functions as f
 
 # Fußball-Mannschaften aus Meldeliste einlesen
 teams1 = pd.read_excel(
-    'Sollberechnung/Saison_2025_2026/Mannschaftesmeldungen 2526.xls',
+    'Sollberechnung/Saison_2026_2027/Mannschaftsmeldungen 26-27 Fussball.xls',
     skiprows=2)
 
 # Futsal-Mannschaften aus Meldeliste einlesen
 teams2 = pd.read_excel(
-    'Sollberechnung/Saison_2025_2026/20250930_meldeliste.xls',
+    'Sollberechnung/Saison_2026_2027/Mannschaftsmeldungen 26-27 Futsal.xls',
     skiprows=2)
 
 # Beide Meldelisten vereinen
 teams = pd.concat([teams1, teams2])
-
+teams = teams.rename(columns={'V. Nr.': 'Vereinsnummer'})  
 teams = teams.melt(id_vars=teams.columns[:10], var_name='Liga')
 teams = teams.dropna(subset='value')
-print('Anzahl Vereine:', teams['V. Nr.'].nunique())
+print('Anzahl Vereine:', teams['Vereinsnummer'].nunique())
         
 teams['SR'] = teams.apply(f.sr_per_team, axis=1)
 teams['OG'] = teams.apply(f.og, axis=1)
 
 # Nach Verein gruppieren
-
-g = teams.groupby('V. Nr.')
+g = teams.groupby('Vereinsnummer')
 
 clubs = pd.DataFrame()
 clubs['Vereinsname'] = g['Vereinsname'].first()
@@ -32,8 +31,6 @@ clubs['Basis-OG pro SR-Fehl [€]'] = g.apply(f.og_per_club)
 clubs['Relevante Mannschaften'] = g.apply(f.relevant_teams)    
 
 # Ergebnisse speichern
-
 with pd.ExcelWriter('sollberechnung.xlsx') as writer:  
     clubs.to_excel(writer, sheet_name='Sollberechnung', float_format="%.2f")
-    teams.to_excel(writer, sheet_name='Mannschaften', index=False, 
-                   float_format="%.2f")
+    teams.to_excel(writer, sheet_name='Mannschaften', index=False, float_format="%.2f")
