@@ -10,11 +10,11 @@ def og(row):
 
 # Sollberechnung laden
 
-soll = pd.read_excel('Sollberechnung/Saison_2025_2026/SR-Soll Saison 2025_2026.xlsx')
+soll = pd.read_excel('Sollberechnung/Saison_2026_2027/sollberechnung.xlsx')
 
 # SR-Stammtdaten laden und gruppieren
 
-sr = pd.read_excel('2025 Q4/sr-stammdaten.xlsx', skiprows=10)
+sr = pd.read_excel('2026 Q3/sr-stammdaten.xlsx', skiprows=10)
 sr = sr.dropna(how='all')
 
 g = sr.groupby('Vereinsnummer')
@@ -23,8 +23,8 @@ ist = pd.DataFrame()
 ist['SR-Ist'] = g.size()
 
 # Soll und Ist vereinen
-soll = soll[['V. Nr.', 'Vereinsname', 'SR-Soll', 'Basis-OG pro SR-Fehl [€]']]
-df = soll.merge(ist, how='outer', left_on='V. Nr.', right_index=True)
+soll = soll[['Vereinsnummer', 'Vereinsname', 'SR-Soll', 'Basis-OG pro SR-Fehl [€]']]
+df = soll.merge(ist, how='outer', left_on='Vereinsnummer', right_index=True)
 
 df['SR-Ist'] = df['SR-Ist'].fillna(0)
 df['SR-Fehl'] = (df['SR-Soll'] - df['SR-Ist']).apply(lambda x: max(0, x))
@@ -42,4 +42,4 @@ if df["SR-Soll"].count() != len(df):
 
 df = df.sort_values(['OG [€]', 'Vereinsname'])
 
-df.to_excel('Quartalsabrechnung_Q4_2025.xlsx', index=False, float_format="%.2f")
+df.to_excel('Quartalsabrechnung_Q3_2026.xlsx', index=False, float_format="%.2f")
